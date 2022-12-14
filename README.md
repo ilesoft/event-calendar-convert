@@ -9,6 +9,7 @@ Our wordpress site likes to eat html tables.
 ## Solution
 
 ```
+ghc convert.hs
 cat input-excel-as-csv-with-real-commas.csv | ./convert > output.html
 
 # Or, to see results
