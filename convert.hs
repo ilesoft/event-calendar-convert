@@ -1,30 +1,41 @@
+import Data.List
 import System.IO
 
 handleSplittedLine :: [String] -> String
 handleSplittedLine [] = ""
-handleSplittedLine [header] = "\n    <th>" ++ header ++ "</th>"
-handleSplittedLine parts
-  | length parts > 2 =
-      "\n    <td>"
-        ++ head parts
-        ++ "</td>\n    <td>"
-        ++ foldl1 (\a b -> a ++ "," ++ b) (tail (init parts))
-        ++ "</td>\n    <td>"
-        ++ last parts
-        ++ "</td>"
+handleSplittedLine [header] = "    <th>" ++ header ++ "</th>"
+handleSplittedLine [date, happening, organizer, audience] =
+  "    <td>"
+    ++ date
+    ++ "</td>\n    <td>"
+    ++ happening
+    ++ "</td>\n    <td>"
+    ++ organizer
+    ++ "</td>\n    <td>"
+    ++ audience
+    ++ "</td>\n"
+handleSplittedLine [a, b, c, d, inCharge] =
+  (handleSplittedLine [a, b, c, d])
+    ++ "    <td>"
+    ++ inCharge
+    ++ "</td>"
+
+stripTabs :: String -> String
+stripTabs s = dropWhileEnd (== '\t') s
 
 split :: String -> [String]
-split s = case dropWhile (== ',') s of
+split s = case dropWhile (== '\t') s of
   "" -> []
   s' -> w : split s''
     where
-      (w, s'') = break (== ',') s'
+      (w, s'') = break (== '\t') s'
 
 handleLine :: String -> String
-handleLine line = "  <tr>" ++ filter (/= '"') (handleSplittedLine (split line)) ++ "\n  </tr>"
+handleLine "" = ""
+handleLine line = "  <tr>\n" ++ handleSplittedLine (split line) ++ "\n  </tr>"
 
 handleFile :: String -> String
-handleFile input = unlines $ map handleLine $ filter (/= ",,") $ lines input
+handleFile input = unlines $ filter (/= "") $ map handleLine $ map stripTabs $ lines input
 
 main = do
   -- those excel files have carriage returns
@@ -32,5 +43,6 @@ main = do
 
   contents <- getContents
   putStrLn "<table>"
+  putStrLn "  <tr><th>Ajankohta</th><th>Tapahtuma</th><th>Järjestäjä</th><th>Kenelle</th><th>Vastuu/lisätietoja</th></tr>"
   putStr $ handleFile contents
   putStrLn "</table>"
