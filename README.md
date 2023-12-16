@@ -10,9 +10,9 @@ Our wordpress site likes to eat html tables.
 
 ```
 ghc convert.hs
-cat input-excel-as-csv-with-real-commas.csv | ./convert > output.html
+cat input-excel.tsv | ./convert > output.html
 
 # Or, to see results
-cat input-excel-as-csv-with-real-commas.csv | ./convert | lynx -stdin  ## Ooh
+cat input-excel.tsv | ./convert | lynx -stdin  ## Ooh
 ```
 
